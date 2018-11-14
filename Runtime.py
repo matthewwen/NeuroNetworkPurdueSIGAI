@@ -1,4 +1,5 @@
 import csv
+import random
 
 class Matrix(object):
 
@@ -20,7 +21,7 @@ class Matrix(object):
 
     #get the row at a certain position in matrix 
     def enter_row(self, pos, row):
-        self.variable[pos] = row;
+        self.variable[pos] = row
     
     #append row into variable
     def enter_row(self, row):
@@ -31,22 +32,54 @@ class Matrix(object):
         for i in range(len(self.variable)):
             self.variable[i][pos] = col[i][0]
 
+    def get_col(self, pos): 
+        col = []
+        for i in range (len(self.variable)):
+            temp = [self.variable[i][pos]]
+            col.append(temp)
+        return col
+    
+    #get the number of columns in matrix 
+    def get_num_col(self):
+        return len(self.variable[0])
+
 class NeuroNetwork(object):
     # The class "constructor" - contains all the weights
     def __init__(self, abs):
+        #creating vector that stores the weights in triangle form 
+        self.weights = [] 
         for i in range(abs):
+            temp0 = []
+            for j in range (i + 1):
+                temp1 = []
+                for k in range (i + 1):
+                    temp1.append(random.uniform(-100, 100))
+                temp0.append(temp1)
+            self.weights.append(temp0)
+
+        #creating vector that stores the vector 
+        self.v = [] 
+        for i in range(abs): 
             temp = []
-            for j in range (abs):
-                temp.append(uniform(-500, 500))
-            self.weights.append(temp)
+            for j in range(i + 1):
+                temp.append([])
+            self.v.append(temp)
 
     #put a vector inside a neuro network set up as a triangle going upward.
-    def put_vector(self, level, pos, v):
-        self.v[level][pos] = v;
+    def put_vector(self, level, pos, val):
+        self.v[level][pos] = val
 
-    #fill neuro network with correct matrix
-    #def fill_vector(self):
-        #starting at the top going downward
+    #get all the vecotrs 
+    def get_vecs(self):
+        for i in range(len(self.v)):
+            print(self.v[i])
+            print("\n") 
+    
+    #get all the weights
+    def get_weights(self):
+        for i in range(len(self.weights)):
+            print(self.weights[i])
+            print("\n") 
 
 #reads the document from excel sheet 
 def inital_read():
@@ -66,6 +99,16 @@ def inital_read():
     return matrix 
 
 # This is the main function 
+
+#getting the values from the csv file 
 matrix  = inital_read() 
-rep = matrix.get_variable()
-print(rep) 
+
+#creating neuro-network with 8 inputs 
+network = NeuroNetwork(8)
+
+#adding column vector to top neuro network 
+for i in range (matrix.get_num_col() - 1):
+    network.put_vector(7, i, matrix.get_col(i))  
+
+#print the weights 
+network.get_weights()
