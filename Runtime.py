@@ -46,17 +46,29 @@ class Matrix(object):
 class NeuroNetwork(object):
     # The class "constructor" - contains all the weights
     def __init__(self, abs):
-        #creating vector that stores the weights in triangle form 
-        self.weights = [] 
-        for i in range(abs):
-            temp0 = []
-            for j in range (i + 1):
-                temp1 = []
-                for k in range (i + 1):
-                    #random.uniform(-100, 100)
-                    temp1.append(2)
-                temp0.append(temp1)
-            self.weights.append(temp0)
+        #you want abs - 1 level of weights to carry 
+        self.weights = []
+        for i in range(abs - 1):
+            level  = [] #array for that level. 
+            
+            #if i = 0, that means you have 1 neuro that needs 2 weights each 
+            #if i = 1, that means you have 2 neuro that needs 3 weights each 
+            #if i = 2, that means you have 3 neuros that need 4 weights each
+            
+            #creating matrix that holds the neuro
+            for j in range(i + 1):
+                neuro = [] 
+
+                #i = 0, if 1 neuro, it will create 1 array with 2 element
+                #i = 1, if 2 neuro, it will create 2 arrays with 3 elements each
+                #i = 2, if 3 neuro, it will create 3 arrays with 4 elements each 
+                
+                for k in range(i + 2):
+                    neuro.append(2)
+                
+                level.append(neuro)
+            
+            self.weights.append(level)
 
         #creating vector that stores the vector 
         self.v = [] 
@@ -85,27 +97,37 @@ class NeuroNetwork(object):
     #make a column with just 0s 
     def make_col(self, size):
         result = [] 
-        for i in range(size):
+        while size > 0:
             result.append([0])
-            i = i 
+            size = size - 1
         return result
 
     #getting new element that should be in vector.
     def fill_element(self):
-        #for loop for level of abstraction 
-        for i in range(len(self.weights)): 
-            index = len(self.weights) - 1 - i #index is level of abstraction for weights 
-            #getting vector of weights 
-            for j in range(len(self.weights[index])): 
-                #getting the weights going into one neuron
-                newVec = self.make_col(len(self.v[index][0]))
-                weight = self.weights[index][j] #weights for vectors
-                vectors = self.v[index] #vectors to put weights on 
-                for k in range(len(weight)): 
-                    temp = self.mult_weight_col(weight, vectors[k])
-                    newVec = self.add_col(newVec, temp)
-                self.v[index][j] = newVec
-        
+        #in needs to start at the top 
+        index = len(self.v) - 1
+
+        #self.v[index] -> it returns all the vectors at that level
+        #self.weights[index-1] -> return the proper weights for self.v in vector forms. 
+        # * just want one set? then you do self.weights[index-1][val] where val cannot 
+        # * be greater than index
+        # print(self.v[index])
+        # print('\n')
+        # print(self.weights[index - 1][0])
+
+        test = self.new_vect(self.v[index], self.weights[index - 1][0])
+
+        #after it calculates test, it needs to put it at a lower level, same 
+        # * index position 
+        self.v[index - 1][0] = test
+
+    def new_vect(self, col1, weight):
+        newVec = self.make_col(len(col1[0]))
+        for i in range(len(weight)):
+            mulVec = self.mult_weight_col(weight[i], col1[i])
+            newVec = self.add_col(newVec, mulVec)
+        return newVec
+
     def add_col(self, col1, col2):
         answer = [] 
         for i in range(len(col1)):
@@ -117,7 +139,7 @@ class NeuroNetwork(object):
     def mult_weight_col(self, weight, col):
         answer = [] 
         for i in range(len(col)):
-            val = col[i][0] * weight[i]
+            val = col[i][0] * weight
             vec = [val]
             answer.append(vec)
         return answer
@@ -153,9 +175,6 @@ for i in range (matrix.get_num_col() - 1):
     network.put_vector(7, i, matrix.get_col(i))  
 
 #print the weights 
-#network.get_weights()
 network.fill_element()
-
-print("\n//////////////////////////////////////////////\n")
 
 network.get_vecs() 
