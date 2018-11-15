@@ -53,7 +53,8 @@ class NeuroNetwork(object):
             for j in range (i + 1):
                 temp1 = []
                 for k in range (i + 1):
-                    temp1.append(random.uniform(-100, 100))
+                    #random.uniform(-100, 100)
+                    temp1.append(2)
                 temp0.append(temp1)
             self.weights.append(temp0)
 
@@ -80,18 +81,59 @@ class NeuroNetwork(object):
         for i in range(len(self.weights)):
             print(self.weights[i])
             print("\n") 
+    
+    #make a column with just 0s 
+    def make_col(self, size):
+        result = [] 
+        for i in range(size):
+            result.append([0])
+            i = i 
+        return result
+
+    #getting new element that should be in vector.
+    def fill_element(self):
+        #for loop for level of abstraction 
+        for i in range(len(self.weights)): 
+            index = len(self.weights) - 1 - i #index is level of abstraction for weights 
+            #getting vector of weights 
+            for j in range(len(self.weights[index])): 
+                #getting the weights going into one neuron
+                newVec = self.make_col(len(self.v[index][0]))
+                weight = self.weights[index][j] #weights for vectors
+                vectors = self.v[index] #vectors to put weights on 
+                for k in range(len(weight)): 
+                    temp = self.mult_weight_col(weight, vectors[k])
+                    newVec = self.add_col(newVec, temp)
+                self.v[index][j] = newVec
+        
+    def add_col(self, col1, col2):
+        answer = [] 
+        for i in range(len(col1)):
+            val = col2[i][0] + col1[i][0]
+            vec = [val]
+            answer.append(vec)
+        return answer
+    
+    def mult_weight_col(self, weight, col):
+        answer = [] 
+        for i in range(len(col)):
+            val = col[i][0] * weight[i]
+            vec = [val]
+            answer.append(vec)
+        return answer
 
 #reads the document from excel sheet 
 def inital_read():
     matrix = Matrix(); 
-    with open('california_housing_train.csv') as csv_file:
+    #'california_housing_train.csv'
+    with open('test.csv') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         header = 0
         for row in csv_reader:
             if header != 0 :
                 vector = [] 
                 for i in range(9):
-                    vector.append(row[i])
+                    vector.append(int(row[i]))
                 matrix.enter_row(vector)
             else: 
                 header += 1
@@ -111,4 +153,9 @@ for i in range (matrix.get_num_col() - 1):
     network.put_vector(7, i, matrix.get_col(i))  
 
 #print the weights 
-network.get_weights()
+#network.get_weights()
+network.fill_element()
+
+print("\n//////////////////////////////////////////////\n")
+
+network.get_vecs() 
