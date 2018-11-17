@@ -101,6 +101,23 @@ class Matrix(object):
         for i in range(len(vecRow)):
             sum += vecRow[i] * vecCol[i][0]
         return sum
+    
+    def mult_row(self, rowIndex, weight):
+        for i in range(len(self.variable[rowIndex])):
+           self.variable[rowIndex] *= weight
+
+    def sub_row(self, mainRwoIndex, subRowIndex): 
+        for i in range(len(self.variable[mainRwoIndex])):
+            self.variable[mainRwoIndex] -= self.variable[subRowIndex] 
+
+    def solve_matrix(self, matrix): 
+        #getting the Lower D part 
+        #multiply 0 row by 1 row 0 value / 0 row 0 value. Subtract row 1 by row 0 
+        #multiply 1 row by 2 row 1 value / 1 row 1 value. Subtract row 2 by row 1 
+
+        #make the diagonal all 1 
+
+        #getting rid of the upper 
 
 
 class NeuroNetwork(object):
@@ -208,7 +225,6 @@ class NeuroNetwork(object):
         rowechelon = tranTA
         rowechelon.enter_col_append(tranAB.get_col(0))
         rowechelon.print()
-
 
 
     def new_vect(self, col1, weight):
