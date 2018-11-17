@@ -104,22 +104,23 @@ class NeuroNetwork(object):
 
     #getting new element that should be in vector.
     def fill_element(self):
-        #in needs to start at the top 
-        index = len(self.v) - 1
+        #in needs to start at the top but not the last indencies 
+        for i in range(len(self.v) - 2):
+            index = len(self.v) - i - 1 #determines the level it is on 
 
-        #self.v[index] -> it returns all the vectors at that level
-        #self.weights[index-1] -> return the proper weights for self.v in vector forms. 
-        # * just want one set? then you do self.weights[index-1][val] where val cannot 
-        # * be greater than index
-        # print(self.v[index])
-        # print('\n')
-        # print(self.weights[index - 1][0])
+            #self.v[index] -> it returns all the vectors at that level
+            #self.weights[index-1] -> return the proper weights for self.v in vector forms. 
+            # * just want one set? then you do self.weights[index-1][val] where val cannot 
+            # * be greater than index
+            # print(self.v[index])
+            # print('\n')
+            # print(self.weights[index - 1][0])
 
-        test = self.new_vect(self.v[index], self.weights[index - 1][0])
-
-        #after it calculates test, it needs to put it at a lower level, same 
-        # * index position 
-        self.v[index - 1][0] = test
+            for j in range(len(self.v[index]) - 1):
+                test = self.new_vect(self.v[index], self.weights[index - 1][j])
+                #after it calculates test, it needs to put it at a lower level, same 
+                # * index position 
+                self.v[index - 1][j] = test
 
     def new_vect(self, col1, weight):
         newVec = self.make_col(len(col1[0]))
