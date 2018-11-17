@@ -4,7 +4,7 @@ import random
 class Matrix(object):
 
     # The class "constructor" - It's actually an initializer
-    def __init__(self, row, col):
+    def setup(self, row, col):
         self.variable = []
         for i in range(row):
             temp = []
@@ -31,6 +31,11 @@ class Matrix(object):
     def enter_col(self, pos, col):
         for i in range(len(self.variable)):
             self.variable[i][pos] = col[i][0]
+    
+    #enter all the elements in this column as 1
+    def enter_col_1(self, size):
+        for i in range(size): 
+            self.variable[i][0] = 1 
 
     def get_col(self, pos): 
         col = []
@@ -42,6 +47,11 @@ class Matrix(object):
     #get the number of columns in matrix 
     def get_num_col(self):
         return len(self.variable[0])
+    
+    #print all the rows and columns 
+    def print(self):
+        for i in range(len(self.variable)):
+            print(self.variable[i])
 
 class NeuroNetwork(object):
     # The class "constructor" - contains all the weights
@@ -77,6 +87,9 @@ class NeuroNetwork(object):
             for j in range(i + 1):
                 temp.append([])
             self.v.append(temp)
+        
+        #creating a + b vector 
+        self.b = 0 
 
     #put a vector inside a neuro network set up as a triangle going upward.
     def put_vector(self, level, pos, val):
@@ -121,6 +134,16 @@ class NeuroNetwork(object):
                 #after it calculates test, it needs to put it at a lower level, same 
                 # * index position 
                 self.v[index - 1][j] = test
+        
+        #Now that all the elements are fill, find that last two weights by 
+        # * creating a matrix with 1, v1, and then v2
+        matrx = Matrix()
+        matrx.setup(len(self.v[1][0]), 3)
+        matrx.enter_col_1(len(self.v[1][0]))
+        matrx.enter_col(1, self.v[1][0])
+        matrx.enter_col(2, self.v[1][1])
+        matrx.print()
+
 
     def new_vect(self, col1, weight):
         newVec = self.make_col(len(col1[0]))
@@ -178,4 +201,4 @@ for i in range (matrix.get_num_col() - 1):
 #print the weights 
 network.fill_element()
 
-network.get_vecs() 
+#network.get_vecs() 
