@@ -11,6 +11,10 @@ class Matrix(object):
             for j in range (col):
                 temp.append(0)
             self.variable.append(temp)
+
+    #if all the elements are known, store it 
+    def setupAllElement(self, var):
+        self.variable = var 
     
     def __init__(self):
         self.variable = []
@@ -31,6 +35,11 @@ class Matrix(object):
     def enter_col(self, pos, col):
         for i in range(len(self.variable)):
             self.variable[i][pos] = col[i][0]
+
+    #adding the column at the end of all
+    def enter_col_append(self, col):
+        for i in range(len(self.variable)):
+            self.variable[i].append(col[i][0])
     
     #enter all the elements in this column as 1
     def enter_col_1(self, size):
@@ -48,10 +57,51 @@ class Matrix(object):
     def get_num_col(self):
         return len(self.variable[0])
     
+    #get the number of rows in matrix
+    def get_num_row(self):
+        return len(self.variable)
+    
+
     #print all the rows and columns 
     def print(self):
         for i in range(len(self.variable)):
             print(self.variable[i])
+    
+    #convert column vector to a row
+    def convert_col_to_row(self, col):
+        row = [] 
+        for i in range(len(col)):
+            row.append(col[i][0])
+        return row 
+
+    #get transpose of a matrix 
+    def get_tranpose(self):
+        element = []
+        for i in range (self.get_num_col()):
+            temp = self.get_col(i)
+            convert = self.convert_col_to_row(temp)
+            element.append(convert)
+        return element
+
+    def mult_matrix(self, matrix):
+        newM = Matrix() 
+        result = [] 
+        for i in range(self.get_num_row()):
+            temp = [] 
+            vect1 = self.variable[i]
+            for j in range(matrix.get_num_col()):
+                vect2 = matrix.get_col(j)
+                temp.append(self.val_point(vect1, vect2))
+            result.append(temp)
+        newM.setupAllElement(result)
+        return newM
+    
+    def val_point(self, vecRow, vecCol):
+        sum = 0
+        for i in range(len(vecRow)):
+            sum += vecRow[i] * vecCol[i][0]
+        return sum
+
 
 class NeuroNetwork(object):
     # The class "constructor" - contains all the weights
@@ -116,7 +166,7 @@ class NeuroNetwork(object):
         return result
 
     #getting new element that should be in vector.
-    def fill_element(self):
+    def fill_element(self, bMatrix):
         #in needs to start at the top but not the last indencies 
         for i in range(len(self.v) - 2):
             index = len(self.v) - i - 1 #determines the level it is on 
@@ -142,7 +192,23 @@ class NeuroNetwork(object):
         matrx.enter_col_1(len(self.v[1][0]))
         matrx.enter_col(1, self.v[1][0])
         matrx.enter_col(2, self.v[1][1])
-        matrx.print()
+        
+        #Getting the tranpose matrix  
+        transposeVect = matrx.get_tranpose()
+        tranpose = Matrix()
+        tranpose.setupAllElement(transposeVect) 
+
+        #getting A tranpose * A 
+        tranTA = tranpose.mult_matrix(matrx)
+
+        #getting At * b 
+        tranAB = tranpose.mult_matrix(bMatrix)
+
+        #setting up matrix for row echelon 
+        rowechelon = tranTA
+        rowechelon.enter_col_append(tranAB.get_col(0))
+        rowechelon.print()
+
 
 
     def new_vect(self, col1, weight):
@@ -170,7 +236,7 @@ class NeuroNetwork(object):
 
 #reads the document from excel sheet 
 def inital_read():
-    matrix = Matrix(); 
+    matrix = Matrix()
     #'california_housing_train.csv'
     with open('test.csv') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
@@ -198,7 +264,11 @@ network = NeuroNetwork(8)
 for i in range (matrix.get_num_col() - 1):
     network.put_vector(7, i, matrix.get_col(i))  
 
+b = Matrix()
+lastCol = matrix.get_col(matrix.get_num_col() - 1)
+b.setupAllElement(lastCol)
+
 #print the weights 
-network.fill_element()
+network.fill_element(b)
 
 #network.get_vecs() 
