@@ -11,13 +11,16 @@ class Matrix(object):
             for j in range (col):
                 temp.append(0)
             self.variable.append(temp)
+        return
 
     #if all the elements are known, store it 
     def setupAllElement(self, var):
         self.variable = var 
+        return
     
     def __init__(self):
         self.variable = []
+        return
 
     #get the entire matrix 
     def get_variable(self):
@@ -26,25 +29,30 @@ class Matrix(object):
     #get the row at a certain position in matrix 
     def enter_row(self, pos, row):
         self.variable[pos] = row
+        return
     
     #append row into variable
     def enter_row(self, row):
         self.variable.append(row)
+        return
 
     #get the column at a certain positin in matrix
     def enter_col(self, pos, col):
         for i in range(len(self.variable)):
             self.variable[i][pos] = col[i][0]
+        return
 
     #adding the column at the end of all
     def enter_col_append(self, col):
         for i in range(len(self.variable)):
             self.variable[i].append(col[i][0])
+        return
     
     #enter all the elements in this column as 1
     def enter_col_1(self, size):
         for i in range(size): 
-            self.variable[i][0] = 1 
+            self.variable[i][0] = 1
+        return 
 
     def get_col(self, pos): 
         col = []
@@ -66,6 +74,7 @@ class Matrix(object):
     def print(self):
         for i in range(len(self.variable)):
             print(self.variable[i])
+        return
     
     #convert column vector to a row
     def convert_col_to_row(self, col):
@@ -104,21 +113,52 @@ class Matrix(object):
     
     def mult_row(self, rowIndex, weight):
         for i in range(len(self.variable[rowIndex])):
-           self.variable[rowIndex] *= weight
+           self.variable[rowIndex][i] *= weight
+        return
 
     def sub_row(self, mainRwoIndex, subRowIndex): 
         for i in range(len(self.variable[mainRwoIndex])):
-            self.variable[mainRwoIndex] -= self.variable[subRowIndex] 
+            self.variable[mainRwoIndex][i] -= self.variable[subRowIndex][i] 
+        return
 
-    def solve_matrix(self, matrix): 
+    def solve_matrix(self): 
         #getting the Lower D part 
-        #multiply 0 row by 1 row 0 value / 0 row 0 value. Subtract row 1 by row 0 
-        #multiply 1 row by 2 row 1 value / 1 row 1 value. Subtract row 2 by row 1 
+        for i in range(len(self.variable) - 1):
+            for j in range(i + 1, len(self.variable)):
+                #multiply 0 row by 1 row 0 value / 0 row 0 value. Subtract row 1 by row 0 
+                #multiply 1 row by 2 row 1 value / 1 row 1 value. Subtract row 2 by row 1 
+                mult = self.variable[j][i] / self.variable[i][i]
+                self.mult_row(i, mult)
+                self.sub_row(j, i)
 
         #make the diagonal all 1 
+        for i in range(len(self.variable)):
+            div = self.variable[i][i]
+            self.mult_row(i, 1 / div)
 
         #getting rid of the upper 
-
+        for i  in range(1, len(self.variable)):
+            holder = self.copy_row(i)
+            for j in range(0, i):
+                top = self.variable[j][i]
+                self.mult_row(i, top)
+                self.sub_row(j, i)
+                self.variable[i] = holder
+                holder = self.copy_row(i)
+        return
+    
+    def copy_row(self, index):
+        copyNew = []
+        for i in range(len(self.variable[index])):
+            copyNew.append(self.variable[index][i])
+        return copyNew
+    
+    #puts it into a single vector with b, w1, and then w2
+    def result(self):
+        r = [] 
+        for i in range(len(self.variable)):
+            r.append(self.variable[i][len(self.variable[0]) - 1])
+        return r
 
 class NeuroNetwork(object):
     # The class "constructor" - contains all the weights
@@ -141,7 +181,7 @@ class NeuroNetwork(object):
                 #i = 2, if 3 neuro, it will create 3 arrays with 4 elements each 
                 
                 for k in range(i + 2):
-                    neuro.append(2)
+                    neuro.append(random.uniform(-50, 50))
                 
                 level.append(neuro)
             
@@ -157,22 +197,26 @@ class NeuroNetwork(object):
         
         #creating a + b vector 
         self.b = 0 
+        return
 
     #put a vector inside a neuro network set up as a triangle going upward.
     def put_vector(self, level, pos, val):
         self.v[level][pos] = val
+        return
 
     #get all the vecotrs 
     def get_vecs(self):
         for i in range(len(self.v)):
             print(self.v[i])
             print("\n") 
+        return
     
     #get all the weights
     def get_weights(self):
         for i in range(len(self.weights)):
             print(self.weights[i])
             print("\n") 
+        return
     
     #make a column with just 0s 
     def make_col(self, size):
@@ -224,8 +268,24 @@ class NeuroNetwork(object):
         #setting up matrix for row echelon 
         rowechelon = tranTA
         rowechelon.enter_col_append(tranAB.get_col(0))
-        rowechelon.print()
+        
+        #solving matrix for row echelon    
+        rowechelon.solve_matrix()
 
+        #from solving afor At*A*x = At * b. put values into neuro network 
+        result = rowechelon.result()
+        self.b = result[0]
+        self.weights[0][0][0] = result[1]
+        self.weights[0][0][1] = result[2]
+
+        #updating bottom values
+        test = self.new_vect(self.v[1], self.weights[0][0])
+        for i in range(len(test)):
+            test[i][0] += self.b
+        self.v[0][0] = test        
+
+        #gives new predicted values
+        return self.v[0][0]
 
     def new_vect(self, col1, weight):
         newVec = self.make_col(len(col1[0]))
@@ -261,7 +321,7 @@ def inital_read():
             if header != 0 :
                 vector = [] 
                 for i in range(9):
-                    vector.append(int(row[i]))
+                    vector.append(float(row[i]))
                 matrix.enter_row(vector)
             else: 
                 header += 1
@@ -280,6 +340,7 @@ network = NeuroNetwork(8)
 for i in range (matrix.get_num_col() - 1):
     network.put_vector(7, i, matrix.get_col(i))  
 
+#the actual output 
 b = Matrix()
 lastCol = matrix.get_col(matrix.get_num_col() - 1)
 b.setupAllElement(lastCol)
