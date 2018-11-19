@@ -286,6 +286,23 @@ class NeuroNetwork(object):
 
         #gives new predicted values
         return self.v[0][0]
+    
+    #touch each weight and determine gradient 
+    def gradient(self, bCol):
+        for i in range(len(self.weights) - 1): 
+            index = len(self.weights) - i - 1 
+            for j in range(len(self.weights[index])):
+                for k in range(len(self.weights[index][j])):
+                    self.weights[index][j][k] = 1
+    
+    #get the loss 
+    def sum_los(self, bCol, pCol):
+        sum = 0 
+        for i in range(len(bCol)):
+            sum += abs(bCol[i][0] - pCol[i][0])
+        return sum
+
+    #determine the weight at a particular index
 
     def new_vect(self, col1, weight):
         newVec = self.make_col(len(col1[0]))
@@ -347,5 +364,6 @@ b.setupAllElement(lastCol)
 
 #print the weights 
 network.fill_element(b)
+network.gradient(b.get_col(0))
 
-#network.get_vecs() 
+network.get_weights() 
