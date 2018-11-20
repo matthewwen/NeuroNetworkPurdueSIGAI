@@ -32,7 +32,7 @@ class Matrix(object):
         return
     
     #append row into variable
-    def enter_row(self, row):
+    def append_row(self, row):
         self.variable.append(row)
         return
 
@@ -68,7 +68,6 @@ class Matrix(object):
     #get the number of rows in matrix
     def get_num_row(self):
         return len(self.variable)
-    
 
     #print all the rows and columns 
     def print(self):
@@ -288,12 +287,15 @@ class NeuroNetwork(object):
         return self.v[0][0]
     
     #touch each weight and determine gradient 
-    def gradient(self, bCol):
+    def gradient(self, bMatrix):
         for i in range(len(self.weights) - 1): 
             index = len(self.weights) - i - 1 
             for j in range(len(self.weights[index])):
                 for k in range(len(self.weights[index][j])):
-                    self.weights[index][j][k] = 1
+                    print("start train index")
+                    self.weights[index][j][k] = self.gues(0, 2, index, j, k, bMatrix)
+                    print("train train train \n")
+        return
     
     #get the loss 
     def sum_los(self, bCol, pCol):
@@ -302,8 +304,52 @@ class NeuroNetwork(object):
             sum += abs(bCol[i][0] - pCol[i][0])
         return sum
 
-    #determine the weight at a particular index
+    #using recursion to determine the best value
+    def gues(self, middle, pos, index, j, k, bMatrix):
+        size = 10**pos #distance between each value
+        start = middle - (10 * size) 
+        test = []
 
+        #creating values to test
+        for i in range (20):
+            test.append(start + (i * size))
+
+        #testing the first value in index 
+        self.weights[index][j][k] = test[0]
+        pred = self.fill_element(bMatrix)
+        actual = bMatrix.get_col(0)
+        minLos = self.sum_los(pred, actual)
+        minVal = test[0]
+
+        #testing every in the test array
+        for i in range(1, len(test)): 
+            self.weights[index][j][k] = test[i]
+            tempPred = self.fill_element(bMatrix)
+            tempActual = bMatrix.get_col(0)
+            tempLos = self.sum_los(tempPred, tempActual)
+            if tempLos < minLos : 
+                minLos = tempLos
+                minVal = test[i]
+        
+        #once done, it finds the next value to go to. 
+        if pos < -5: 
+            return minVal
+        else: 
+            pos = pos - 1
+            return self.gues(minVal, pos, index, j, k, bMatrix)
+
+    #with new data set, it will test new values
+    def solve(self):
+        for i in range(len(self.v)):
+            index = len(self.v) - i - 1 #determines the level it is on 
+            if index != 0 :
+                for j in range(len(self.v[index]) - 1):
+                    test = self.new_vect(self.v[index], self.weights[index - 1][j])
+                    self.v[index - 1][j] = test
+            
+        return self.v[0][0]
+
+    #determine the weight at a particular index
     def new_vect(self, col1, weight):
         newVec = self.make_col(len(col1[0]))
         for i in range(len(weight)):
@@ -331,7 +377,7 @@ class NeuroNetwork(object):
 def inital_read():
     matrix = Matrix()
     #'california_housing_train.csv'
-    with open('test.csv') as csv_file:
+    with open('california_housing_train.csv') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         header = 0
         for row in csv_reader:
@@ -339,11 +385,39 @@ def inital_read():
                 vector = [] 
                 for i in range(9):
                     vector.append(float(row[i]))
-                matrix.enter_row(vector)
+                matrix.append_row(vector)
             else: 
                 header += 1
     
     return matrix 
+
+# read the document for the test
+def test_read():
+    matrix = Matrix()
+    with open('california_housing_test.csv') as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        header = 0
+        for row in csv_reader:
+            if header != 0 :
+                vector = [] 
+                for i in range(8):
+                    vector.append(float(row[i]))
+                matrix.append_row(vector)
+            else: 
+                header += 1
+
+    return matrix
+
+# writes the the result for the test
+def write_result(val):
+    with open('california_housing_submission.csv', mode='w') as employee_file:
+        employee_writer = csv.writer(employee_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        employee_writer.writerow(['ID', 'median_house_value'])
+        for i in range(len(val)):
+            index = i + 1
+            employee_writer.writerow([index,val[i][0]])
+    
+    return
 
 # This is the main function 
 
@@ -363,7 +437,20 @@ lastCol = matrix.get_col(matrix.get_num_col() - 1)
 b.setupAllElement(lastCol)
 
 #print the weights 
-network.fill_element(b)
-network.gradient(b.get_col(0))
+print("Start Training!!\n")
+count = 0 
+while count < 1:
+    network.gradient(b)
+    count += 1
 
-network.get_weights() 
+print("Done Training!!\n")
+#now that the model is trained, we will get the test dataset
+testMatrix = test_read()
+for i in range (testMatrix.get_num_col()):
+    network.put_vector(7, i, testMatrix.get_col(i))  
+newPredictedResult = network.solve()
+print("Done Solving")
+
+#putting results into program
+write_result(network.v[0][0])
+print("Done inputting")
