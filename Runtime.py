@@ -400,7 +400,7 @@ def test_read():
         for row in csv_reader:
             if header != 0 :
                 vector = [] 
-                for i in range(8):
+                for i in range(9):
                     if i != 0: 
                         vector.append(float(row[i]))
                 matrix.append_row(vector)
@@ -420,40 +420,43 @@ def write_result(val):
     
     return
 
-# This is the main function 
+# # This is the main function 
 
-#getting the values from the csv file 
-matrix  = inital_read() 
+# #getting the values from the csv file 
+# matrix  = inital_read() 
 
-#creating neuro-network with 8 inputs 
-network = NeuroNetwork(8)
+# #creating neuro-network with 8 inputs 
+# network = NeuroNetwork(8)
 
-#adding column vector to top neuro network 
-for i in range (matrix.get_num_col() - 1):
-    network.put_vector(7, i, matrix.get_col(i))  
+# #adding column vector to top neuro network 
+# for i in range (matrix.get_num_col() - 1):
+#     network.put_vector(7, i, matrix.get_col(i))  
 
-#the actual output 
-b = Matrix()
-lastCol = matrix.get_col(matrix.get_num_col() - 1)
-b.setupAllElement(lastCol)
+# #the actual output 
+# b = Matrix()
+# lastCol = matrix.get_col(matrix.get_num_col() - 1)
+# b.setupAllElement(lastCol)
 
-#print the weights 
-print("Start Training!!\n")
-count = 0 
-network.gradient(b)
+# #print the weights 
+# print("Start Training!!\n")
+# count = 0 
+# network.gradient(b)
 
-print("Done Training!!\n")
-#now that the model is trained, we will get the test dataset
-testMatrix = test_read()
-for i in range (testMatrix.get_num_col()):
-    network.put_vector(7, i, testMatrix.get_col(i))  
-newPredictedResult = network.solve()
-print("Done Solving")
+# print("Done Training!!\n")
+# #now that the model is trained, we will get the test dataset
+# testMatrix = test_read()
+# for i in range (testMatrix.get_num_col()):
+#     network.put_vector(7, i, testMatrix.get_col(i))  
+# newPredictedResult = network.solve()
+# print("Done Solving")
 
-#putting results into program
-write_result(network.v[0][0])
-print("Done inputting")
+# #putting results into program
+# write_result(network.v[0][0])
+# print("Done inputting")
 
-#displaying weights through the terminal
-network.get_weights()
+# #displaying weights through the terminal
+# network.get_weights()
+
+test = test_read()
+test.print()
 
