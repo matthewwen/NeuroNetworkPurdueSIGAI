@@ -307,11 +307,11 @@ class NeuroNetwork(object):
     #using recursion to determine the best value
     def gues(self, middle, pos, index, j, k, bMatrix):
         size = 10**pos #distance between each value
-        start = middle - (10 * size) 
+        start = middle - (5 * size) 
         test = []
 
         #creating values to test
-        for i in range (20):
+        for i in range (10):
             test.append(start + (i * size))
 
         #testing the first value in index 
@@ -332,7 +332,7 @@ class NeuroNetwork(object):
                 minVal = test[i]
         
         #once done, it finds the next value to go to. 
-        if pos < -5: 
+        if pos < -3: 
             return minVal
         else: 
             pos = pos - 1
@@ -401,17 +401,18 @@ def test_read():
             if header != 0 :
                 vector = [] 
                 for i in range(8):
-                    vector.append(float(row[i]))
+                    if i != 0: 
+                        vector.append(float(row[i]))
                 matrix.append_row(vector)
             else: 
                 header += 1
 
     return matrix
 
-# writes the the result for the test
+# writes the result for the test
 def write_result(val):
-    with open('california_housing_submission.csv', mode='w') as employee_file:
-        employee_writer = csv.writer(employee_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+    with open('california_housing_submission.csv', mode='w', newline = '') as csv_file:
+        employee_writer = csv.writer(csv_file)
         employee_writer.writerow(['ID', 'median_house_value'])
         for i in range(len(val)):
             index = i + 1
@@ -439,9 +440,7 @@ b.setupAllElement(lastCol)
 #print the weights 
 print("Start Training!!\n")
 count = 0 
-while count < 1:
-    network.gradient(b)
-    count += 1
+network.gradient(b)
 
 print("Done Training!!\n")
 #now that the model is trained, we will get the test dataset
@@ -454,3 +453,7 @@ print("Done Solving")
 #putting results into program
 write_result(network.v[0][0])
 print("Done inputting")
+
+#displaying weights through the terminal
+network.get_weights()
+
