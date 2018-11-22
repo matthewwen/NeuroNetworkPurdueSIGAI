@@ -342,10 +342,16 @@ class NeuroNetwork(object):
     def solve(self):
         for i in range(len(self.v)):
             index = len(self.v) - i - 1 #determines the level it is on 
-            if index != 0 :
+            if index > 1 :
                 for j in range(len(self.v[index]) - 1):
                     test = self.new_vect(self.v[index], self.weights[index - 1][j])
                     self.v[index - 1][j] = test
+
+        #updating bottom values
+        test = self.new_vect(self.v[1], self.weights[0][0])
+        for i in range(len(test)):
+            test[i][0] += self.b
+        self.v[0][0] = test   
             
         return self.v[0][0]
 
@@ -377,7 +383,7 @@ class NeuroNetwork(object):
 def inital_read():
     matrix = Matrix()
     #'california_housing_train.csv'
-    with open('california_housing_train.csv') as csv_file:
+    with open('test_train.csv') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         header = 0
         for row in csv_reader:
@@ -394,7 +400,7 @@ def inital_read():
 # read the document for the test
 def test_read():
     matrix = Matrix()
-    with open('california_housing_test.csv') as csv_file:
+    with open('test_test.csv') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         header = 0
         for row in csv_reader:
@@ -456,3 +462,6 @@ print("Done inputting")
 
 #displaying weights through the terminal
 network.get_weights()
+
+#displaying the +b 
+print(network.b)
