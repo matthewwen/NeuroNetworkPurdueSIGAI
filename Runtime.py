@@ -383,7 +383,7 @@ class NeuroNetwork(object):
 def inital_read():
     matrix = Matrix()
     #'california_housing_train.csv'
-    with open('california_housing_train.csv') as csv_file:
+    with open('test_train.csv') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         header = 0
         for row in csv_reader:
@@ -400,7 +400,7 @@ def inital_read():
 # read the document for the test
 def test_read():
     matrix = Matrix()
-    with open('california_housing_test.csv') as csv_file:
+    with open('test_test.csv') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         header = 0
         for row in csv_reader:
@@ -417,7 +417,7 @@ def test_read():
 
 # writes the result for the test
 def write_result(val):
-    with open('california_housing_submission.csv', mode='w', newline = '') as csv_file:
+    with open('test_submission.csv', mode='w', newline = '') as csv_file:
         employee_writer = csv.writer(csv_file)
         employee_writer.writerow(['ID', 'median_house_value'])
         for i in range(len(val)):
