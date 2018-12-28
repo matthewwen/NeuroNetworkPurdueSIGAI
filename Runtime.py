@@ -55,16 +55,15 @@ matrix  = inital_read()
 
 #creating neuro-network with 3 inputs 
 network = NeuroNetwork.NeuroNetwork(8,3)
-network.get_weights()
 
-# #adding column vector to top neuro network 
-# for i in range (matrix.get_num_col() - 1):
-#     network.put_vector(7, i, matrix.get_col(i))  
+#adding column vector to top neuro network 
+for i in range (matrix.get_num_col() - 1):
+    network.put_vector(4, i, matrix.get_col(i))  
 
-# #the actual output 
-# b = NeuroNetwork.Matrix.Matrix()
-# lastCol = matrix.get_col(matrix.get_num_col() - 1)
-# b.setupAllElement(lastCol)
+#the actual output 
+b = NeuroNetwork.Matrix.Matrix()
+lastCol = matrix.get_col(matrix.get_num_col() - 1)
+b.setupAllElement(lastCol)
 
 # #print the weights 
 # print("Start Training!!\n")

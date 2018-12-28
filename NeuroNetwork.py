@@ -6,7 +6,25 @@ class NeuroNetwork(object):
     def __init__(self, abs, lev):
         self.weights = [] #variable that stores all the weights.
 
-        #you want lev - 1 level of weights to carry 
+        #initialize top portion of weights  
+        self.define_aweight(abs, lev)
+
+        #initialize very bottom portion of weights  
+        self.define_bweight(abs, lev) 
+
+        #initialize top portion of vectors 
+        self.define_avect(abs, lev)
+        
+        #initialize very bottom portion of vectors
+        self.define_bvect(abs, lev)
+
+        #creating a + b vector 
+        self.b = 0 
+
+        return
+
+    #initialize the weights based off of number of levels wanted by the user 
+    def define_aweight(self, abs, lev):
         for i in range(lev - 1):
             level  = [] #array for that level. 
             
@@ -23,36 +41,50 @@ class NeuroNetwork(object):
                 #i = 2, if 3 neuro, it will create 3 arrays with 4 elements each 
                 
                 for k in range(i + 2):
-                    neuro.append(random.uniform(-50, 50))
+                    #neuro.append(random.uniform(-50, 50))
+                    neuro.append(1); #temporary
                 
                 level.append(neuro)
             
             self.weights.append(level)
+        
+        return
 
-        #creating the very bottom layer 
+    #initialize the weights based off the number inputs from the user 
+    def define_bweight(self, abs, lev):
         bottomLayer = [] #bottom layer have lev - 1 elements, each with abs values inside of it
         for i in range (lev):
             temp = []
             for j in range(abs):
-                temp.append(random.uniform(-50, 50))
+                #temp.append(random.uniform(-50, 50))
+                temp.append(1)
             bottomLayer.append(temp)
         self.weights.append(bottomLayer) 
 
-        #creating vector that stores the vector based off of number of levels request by user - 1
+        return
+    
+    #initialize the vectors based off the number of levels wanted by the user 
+    def define_avect(self, abs, lev):
         self.v = [] 
         for i in range(lev): 
             temp = []
             for j in range(i + 1):
                 temp.append([])
             self.v.append(temp)
-        
-        #creating a + b vector 
-        self.b = 0 
+        return 
+    
+    #initialize the vectors based off the number of inputs from the usr 
+    def define_bvect(self, abs, lev):
+        bottomVect = [] 
+        for i in range(abs): 
+            temp = [] 
+            bottomVect.append(temp)
+        self.v.append(bottomVect)
         return
 
     #put a vector inside a neuro network set up as a triangle going upward.
     def put_vector(self, level, pos, val):
-        self.v[level][pos] = val
+        self.v[level - 1][pos] = val
         return
 
     #get all the vecotrs 
