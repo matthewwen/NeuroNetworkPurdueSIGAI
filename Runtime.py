@@ -65,10 +65,10 @@ b = NeuroNetwork.Matrix.Matrix()
 lastCol = matrix.get_col(matrix.get_num_col() - 1)
 b.setupAllElement(lastCol)
 
-# #print the weights 
-# print("Start Training!!\n")
-# count = 0 
-# network.gradient(b)
+#print the weights 
+print("Start Training!!\n")
+count = 0 
+network.gradient(b)
 
 # print("Done Training!!\n")
 # #now that the model is trained, we will get the test dataset

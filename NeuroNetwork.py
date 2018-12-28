@@ -1,15 +1,15 @@
-import random
 import Matrix
+import Activation
 
 class NeuroNetwork(object):
     # The class "constructor" - contains all the weights
     def __init__(self, abs, lev):
         self.weights = [] #variable that stores all the weights.
 
-        #initialize top portion of weights  
+        #initialize top portion of weights / activation equations  
         self.define_aweight(abs, lev)
 
-        #initialize very bottom portion of weights  
+        #initialize very bottom portion of weights / activation equations
         self.define_bweight(abs, lev) 
 
         #initialize top portion of vectors 
@@ -23,9 +23,12 @@ class NeuroNetwork(object):
 
         return
 
-    #initialize the weights based off of number of levels wanted by the user 
+    #initialize the weights / activation equations based off of number of levels wanted by the user 
     def define_aweight(self, abs, lev):
         for i in range(lev - 1):
+            operation = ['2','3','e']
+            lop = 3
+
             level  = [] #array for that level. 
             
             #if i = 0, that means you have 1 neuro that needs 2 weights each 
@@ -42,7 +45,10 @@ class NeuroNetwork(object):
                 
                 for k in range(i + 2):
                     #neuro.append(random.uniform(-50, 50))
-                    neuro.append(1); #temporary
+                    activate = Activation.Activation('1')
+                    if (i != 0):
+                        activate = Activation.Activation(operation[k % lop])
+                    neuro.append(activate)
                 
                 level.append(neuro)
             
@@ -56,8 +62,8 @@ class NeuroNetwork(object):
         for i in range (lev):
             temp = []
             for j in range(abs):
-                #temp.append(random.uniform(-50, 50))
-                temp.append(1)
+                activate = Activation.Activation('1')
+                temp.append(activate)
             bottomLayer.append(temp)
         self.weights.append(bottomLayer) 
 
@@ -97,8 +103,14 @@ class NeuroNetwork(object):
     #get all the weights
     def get_weights(self):
         for i in range(len(self.weights)):
-            print(self.weights[i])
-            print("\n") 
+            print('{', end = '')
+            for j in range(len(self.weights[i])):
+                print("[", end = '')
+                for k in range(len(self.weights[i][j])):
+                    typeVal = self.weights[i][j][k].get_t()
+                    print(typeVal, end = ", ")
+                print("]", end = '')
+            print("}\n") 
         return
     
     #make a column with just 0s 
@@ -177,7 +189,7 @@ class NeuroNetwork(object):
             for j in range(len(self.weights[index])):
                 for k in range(len(self.weights[index][j])):
                     print("start train index")
-                    self.weights[index][j][k] = self.gues(0, 2, index, j, k, bMatrix)
+                    self.weights[index][j][k].set_w(self.gues(0, 2, index, j, k, bMatrix))
                     print("train train train \n")
         return
     

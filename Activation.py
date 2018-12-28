@@ -27,7 +27,7 @@ class Activation(object):
             self.type = 3
         else:
             self.type = 4 
-        
+                
         return 
 
     #setting up the value for self.divide 
@@ -42,13 +42,19 @@ class Activation(object):
         #determine divide value 
         if sVal > 2:
             self.divide = 10 ** (sVal - 2)
-        
+            sVal = 2
+
+        #if it is type 'e', then minimize it one more time
+        if self.type == 4 :
+            if sVal == 2:
+                self.divide = self.divide * 10
+    
         return
     
     #returns the biggest value inside an array 
     def get_biggest(self, array):
         biggest = 0.0 #biggest value in array
-        size = array.len() #size of the array 
+        size = len(array) #size of the array 
         for i in range(size):
             if biggest < array[i]:
                 biggest = array[i]
@@ -65,33 +71,81 @@ class Activation(object):
 
     #set up type 2
     def set_two(self, array):
-        size = array.len() 
+        size = len(array) 
         for i in range(size):
             array[i] = array[i] ** 2
         return 
     
     #set up type 3 
     def set_three(self, array):
-        size = array.len()
+        size = len(array)
         for i in range(size):
             array[i] = array[i] ** 3
         return
 
     #set up type e
     def set_e(self, array):
-
-        #get the biggest size 
-        size = self.get_size(array)
-        sArray = array.len()
-
-        #minimize to digits of 1
-        if size == 2:
-            self.divide = self.divide * 10
-            for i in range(sArray):
-                array[i] = array[i] / 10
-
+        sArray = len(array)
         #update values in array
         for i in range(sArray):
-            array[i] = math.exp(array[i])
+            array[i] = math.e ** array[i]
         
         return
+
+    #Properly Divide each value based off divide base 
+    def mDivide(self, array):
+        size = len(array)
+        for i in range(size):
+            array[i] = array[i] / self.divide
+
+    #Multiply Weight into array
+    def mWeight(self, array):
+        size = len(array)
+        for i in range(size):
+            array[i] = self.weight * array[i]
+
+    #training the model 
+    def train(self, array):
+        #making values inside array reasonable 
+        self.encode_divide(array)
+        self.mDivide(array)
+
+        #perform operation 
+        if self.type == 2:
+            self.set_two(array)
+        elif self.type == 3:
+            self.set_three(array)
+        elif self.type == 4:
+            self.set_e(array)
+
+        self.mWeight(array)
+
+        return
+
+    #test the model
+    def test(self, array):
+        self.mDivide(array)
+
+        #perform operation 
+        if self.type == 2:
+            self.set_two(array)
+        elif self.type == 3:
+            self.set_three(array)
+        elif self.type == 4:
+            self.set_e(array)
+
+        self.mWeight(array)
+        return
+
+    #get the weight
+    def get_w(self):
+        return self.weight
+    
+    #set the weigth
+    def set_w(self, w):
+        self.weight = w
+        return
+
+    #get the type 
+    def get_t(self): 
+        return self.type
