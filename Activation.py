@@ -56,8 +56,8 @@ class Activation(object):
         biggest = 0.0 #biggest value in array
         size = len(array) #size of the array 
         for i in range(size):
-            if biggest < array[i]:
-                biggest = array[i]
+            if biggest < array[i][0]:
+                biggest = array[i][0]
         return biggest
     
     #return number of digit of number 
@@ -73,14 +73,14 @@ class Activation(object):
     def set_two(self, array):
         size = len(array) 
         for i in range(size):
-            array[i] = array[i] ** 2
+            array[i][0] = array[i][0] ** 2
         return 
     
     #set up type 3 
     def set_three(self, array):
         size = len(array)
         for i in range(size):
-            array[i] = array[i] ** 3
+            array[i][0] = array[i][0] ** 3
         return
 
     #set up type e
@@ -88,7 +88,7 @@ class Activation(object):
         sArray = len(array)
         #update values in array
         for i in range(sArray):
-            array[i] = math.e ** array[i]
+            array[i][0] = math.e ** array[i][0]
         
         return
 
@@ -96,16 +96,19 @@ class Activation(object):
     def mDivide(self, array):
         size = len(array)
         for i in range(size):
-            array[i] = array[i] / self.divide
+            array[i][0] = array[i][0] / self.divide
 
     #Multiply Weight into array
     def mWeight(self, array):
         size = len(array)
         for i in range(size):
-            array[i] = self.weight * array[i]
+            array[i][0] = self.weight * array[i][0]
 
     #training the model 
-    def train(self, array):
+    def train(self, oArray):
+        #copy the array 
+        array = self.copy_array(oArray)
+
         #making values inside array reasonable 
         self.encode_divide(array)
         self.mDivide(array)
@@ -120,10 +123,14 @@ class Activation(object):
 
         self.mWeight(array)
 
-        return
+        return array
 
     #test the model
-    def test(self, array):
+    def test(self, oArray):
+        #copy the array 
+        array = self.copy_array(oArray)
+
+        #divide to ideal numbers
         self.mDivide(array)
 
         #perform operation 
@@ -135,7 +142,7 @@ class Activation(object):
             self.set_e(array)
 
         self.mWeight(array)
-        return
+        return array
 
     #get the weight
     def get_w(self):
@@ -149,3 +156,14 @@ class Activation(object):
     #get the type 
     def get_t(self): 
         return self.type
+
+    #copy the array 
+    def copy_array(self, array):
+        cArray = [] 
+        size = len(array)
+        for i in range(size):
+            temp = []
+            temp.append(array[i][0])
+            cArray.append(temp)
+        
+        return cArray 

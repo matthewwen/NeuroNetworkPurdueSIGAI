@@ -59,6 +59,9 @@ class Matrix(object):
             col.append(temp)
         return col
     
+    def get_row(self, pos):
+        return self.variable[pos]
+
     #get the number of columns in matrix 
     def get_num_col(self):
         return len(self.variable[0])
@@ -89,19 +92,30 @@ class Matrix(object):
             element.append(convert)
         return element
 
+    #multiply two matrix together 
     def mult_matrix(self, matrix):
         newM = Matrix() 
-        result = [] 
-        for i in range(self.get_num_row()):
-            temp = [] 
-            vect1 = self.variable[i]
-            for j in range(matrix.get_num_col()):
-                vect2 = matrix.get_col(j)
-                temp.append(self.val_point(vect1, vect2))
-            result.append(temp)
-        newM.setupAllElement(result)
+        r = self.get_num_row()
+        c = matrix.get_num_col()
+        offset = self.get_num_col() #get total number of data points 
+        newM.setup(r, c)
+        for i in range(r):
+            for j in range(c):
+                temp = self.result_mult_val(self.get_row(i), matrix.get_col(j), offset)
+                newM.setV(i, j, temp)
         return newM
     
+    #find element at position 
+    def result_mult_val(self, iArray, jArray, size):
+        val = 0
+        for i in range(size):
+            val += iArray[i] * jArray[i][0]
+        return val
+    
+    #set value at particular row and column
+    def setV(self, i, j, val):
+        self.variable[i][j] = val
+
     def val_point(self, vecRow, vecCol):
         sum = 0
         for i in range(len(vecRow)):

@@ -26,7 +26,8 @@ class NeuroNetwork(object):
     #initialize the weights / activation equations based off of number of levels wanted by the user 
     def define_aweight(self, abs, lev):
         for i in range(lev - 1):
-            operation = ['2','3','e']
+            operation = ['1', '1', '1']
+            #['2','3','e']
             lop = 3
 
             level  = [] #array for that level. 
@@ -102,15 +103,7 @@ class NeuroNetwork(object):
     
     #get all the weights
     def get_weights(self):
-        for i in range(len(self.weights)):
-            print('{', end = '')
-            for j in range(len(self.weights[i])):
-                print("[", end = '')
-                for k in range(len(self.weights[i][j])):
-                    typeVal = self.weights[i][j][k].get_t()
-                    print(typeVal, end = ", ")
-                print("]", end = '')
-            print("}\n") 
+        print(self.weights)
         return
     
     #make a column with just 0s 
@@ -121,26 +114,27 @@ class NeuroNetwork(object):
             size = size - 1
         return result
 
-    #getting new element that should be in vector.
+    #have values decend 
+    def decend_gradient(self):
+        for i in range(len(self.weights)):
+            index = len(self.weights) - 1 - i #index for weight array
+            vecIndex = index + 1 #index for the vectors neuro network
+            col1 = self.v[vecIndex] 
+            for j in range(len(self.weights[index])):
+                test = self.new_vect(col1, self.weights[index][j])
+                self.v[index][j] = test
+        return
+
+    #getting new element that should be in vector. RETURN new predicted results 
     def fill_element(self, bMatrix):
         #in needs to start at the top but not the last indencies 
-        for i in range(len(self.v) - 2):
-            index = len(self.v) - i - 1 #determines the level it is on 
-
-            #self.v[index] -> it returns all the vectors at that level
-            #self.weights[index-1] -> return the proper weights for self.v in vector forms. 
-            # * just want one set? then you do self.weights[index-1][val] where val cannot 
-            # * be greater than index
-            # print(self.v[index])
-            # print('\n')
-            # print(self.weights[index - 1][0])
-
-            for j in range(len(self.v[index]) - 1):
-                test = self.new_vect(self.v[index], self.weights[index - 1][j])
-                #after it calculates test, it needs to put it at a lower level, same 
-                # * index position 
-                self.v[index - 1][j] = test
+        self.decend_gradient() 
         
+        #determine last 2 weights
+        return self.final_level(bMatrix)        
+    
+    #final 2 weight at lower level, RETURN new predicted values
+    def final_level(self, bMatrix):
         #Now that all the elements are fill, find that last two weights by 
         # * creating a matrix with 1, v1, and then v2
         matrx = Matrix.Matrix()
@@ -148,7 +142,7 @@ class NeuroNetwork(object):
         matrx.enter_col_1(len(self.v[1][0]))
         matrx.enter_col(1, self.v[1][0])
         matrx.enter_col(2, self.v[1][1])
-        
+
         #Getting the tranpose matrix  
         transposeVect = matrx.get_tranpose()
         tranpose = Matrix.Matrix()
@@ -170,8 +164,8 @@ class NeuroNetwork(object):
         #from solving afor At*A*x = At * b. put values into neuro network 
         result = rowechelon.result()
         self.b = result[0]
-        self.weights[0][0][0] = result[1]
-        self.weights[0][0][1] = result[2]
+        self.weights[0][0][0].set_w(result[1])
+        self.weights[0][0][1].set_w(result[2])
 
         #updating bottom values
         test = self.new_vect(self.v[1], self.weights[0][0])
@@ -181,7 +175,7 @@ class NeuroNetwork(object):
 
         #gives new predicted values
         return self.v[0][0]
-    
+
     #touch each weight and determine gradient 
     def gradient(self, bMatrix):
         for i in range(len(self.weights) - 1): 
@@ -211,7 +205,7 @@ class NeuroNetwork(object):
             test.append(start + (i * size))
 
         #testing the first value in index 
-        self.weights[index][j][k] = test[0]
+        self.weights[index][j][k].set_w(test[0])
         pred = self.fill_element(bMatrix)
         actual = bMatrix.get_col(0)
         minLos = self.sum_los(pred, actual)
@@ -219,7 +213,7 @@ class NeuroNetwork(object):
 
         #testing every in the test array
         for i in range(1, len(test)): 
-            self.weights[index][j][k] = test[i]
+            self.weights[index][j][k].set_w(test[i])
             tempPred = self.fill_element(bMatrix)
             tempActual = bMatrix.get_col(0)
             tempLos = self.sum_los(tempPred, tempActual)
@@ -252,13 +246,14 @@ class NeuroNetwork(object):
         return self.v[0][0]
 
     #determine the weight at a particular index
-    def new_vect(self, col1, weight):
-        newVec = self.make_col(len(col1[0]))
-        for i in range(len(weight)):
-            mulVec = self.mult_weight_col(weight[i], col1[i])
+    def new_vect(self, col1, awequation):
+        newVec = self.make_col(len(col1[0])) #makes a copy [works]
+        for i in range(len(awequation)):
+            mulVec = awequation[i].train(col1[i]) 
             newVec = self.add_col(newVec, mulVec)
-        return newVec
+        return newVec 
 
+    #add two columns together, return the answer 
     def add_col(self, col1, col2):
         answer = [] 
         for i in range(len(col1)):
@@ -266,11 +261,7 @@ class NeuroNetwork(object):
             vec = [val]
             answer.append(vec)
         return answer
-    
-    def mult_weight_col(self, weight, col):
-        answer = [] 
-        for i in range(len(col)):
-            val = col[i][0] * weight
-            vec = [val]
-            answer.append(vec)
-        return answer
+
+    ############################################################################################
+    #TESTING 
+    ############################################################################################
