@@ -167,3 +167,10 @@ class Activation(object):
             cArray.append(temp)
         
         return cArray 
+    
+    ######################################################
+    #TEST
+    ######################################################
+
+    def get_d(self):
+        return self.divide

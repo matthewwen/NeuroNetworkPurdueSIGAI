@@ -26,8 +26,7 @@ class NeuroNetwork(object):
     #initialize the weights / activation equations based off of number of levels wanted by the user 
     def define_aweight(self, abs, lev):
         for i in range(lev - 1):
-            operation = ['1', '1', '1']
-            #['2','3','e']
+            operation = ['2','3','e']
             lop = 3
 
             level  = [] #array for that level. 
@@ -91,7 +90,8 @@ class NeuroNetwork(object):
 
     #put a vector inside a neuro network set up as a triangle going upward.
     def put_vector(self, level, pos, val):
-        self.v[level - 1][pos] = val
+        highest = len(self.v) - 1
+        self.v[highest][pos] = val
         return
 
     #get all the vecotrs 
@@ -103,8 +103,7 @@ class NeuroNetwork(object):
     
     #get all the weights
     def get_weights(self):
-        print(self.weights)
-        return
+        return self.weights
     
     #make a column with just 0s 
     def make_col(self, size):
@@ -116,7 +115,7 @@ class NeuroNetwork(object):
 
     #have values decend 
     def decend_gradient(self):
-        for i in range(len(self.weights)):
+        for i in range(len(self.weights) - 1):
             index = len(self.weights) - 1 - i #index for weight array
             vecIndex = index + 1 #index for the vectors neuro network
             col1 = self.v[vecIndex] 
@@ -166,9 +165,9 @@ class NeuroNetwork(object):
         self.b = result[0]
         self.weights[0][0][0].set_w(result[1])
         self.weights[0][0][1].set_w(result[2])
-
+        
         #updating bottom values
-        test = self.new_vect(self.v[1], self.weights[0][0])
+        test = self.new_vect_test(self.v[1], self.weights[0][0])
         for i in range(len(test)):
             test[i][0] += self.b
         self.v[0][0] = test        
@@ -229,27 +228,37 @@ class NeuroNetwork(object):
             return self.gues(minVal, pos, index, j, k, bMatrix)
 
     #with new data set, it will test new values
-    def solve(self):
-        for i in range(len(self.v)):
-            index = len(self.v) - i - 1 #determines the level it is on 
-            if index > 1 :
-                for j in range(len(self.v[index]) - 1):
-                    test = self.new_vect(self.v[index], self.weights[index - 1][j])
-                    self.v[index - 1][j] = test
+    def solve(self):    
+        for i in range(len(self.weights)):
+            wIndex = len(self.weights) - 1 - i
+            vIndex = wIndex + 1 
+            col1 = self.v[vIndex] 
+            for j in range(len(self.weights[wIndex])):
+                test = self.new_vect_test(col1, self.weights[wIndex][j])
+                self.v[wIndex][j] = test
 
         #updating bottom values
-        test = self.new_vect(self.v[1], self.weights[0][0])
+        test = self.new_vect_test(self.v[1], self.weights[0][0])
         for i in range(len(test)):
             test[i][0] += self.b
-        self.v[0][0] = test   
-            
+        self.v[0][0] = test        
+
+        #gives new predicted values
         return self.v[0][0]
 
-    #determine the weight at a particular index
+    #determine the weight at a particular index while training the model
     def new_vect(self, col1, awequation):
         newVec = self.make_col(len(col1[0])) #makes a copy [works]
         for i in range(len(awequation)):
             mulVec = awequation[i].train(col1[i]) 
+            newVec = self.add_col(newVec, mulVec)
+        return newVec 
+
+    #determine the weight at a particular index while testing the model
+    def new_vect_test(self, col1, awequation):
+        newVec = self.make_col(len(col1[0])) #makes a copy [works]
+        for i in range(len(awequation)):
+            mulVec = awequation[i].test(col1[i]) 
             newVec = self.add_col(newVec, mulVec)
         return newVec 
 
@@ -261,7 +270,3 @@ class NeuroNetwork(object):
             vec = [val]
             answer.append(vec)
         return answer
-
-    ############################################################################################
-    #TESTING 
-    ############################################################################################

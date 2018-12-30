@@ -66,9 +66,10 @@ lastCol = matrix.get_col(matrix.get_num_col() - 1)
 b.setupAllElement(lastCol)
 
 # print the weights 
-print("Start Training babababa!!\n")
-count = 0 
+print("Start Training!!\n")
+count = 0
 network.gradient(b)
+temp = network.get_weights()[0][0]
 
 print("Done Training!!\n")
 #now that the model is trained, we will get the test dataset
@@ -80,10 +81,4 @@ print("Done Solving")
 
 #putting results into program
 write_result(network.v[0][0])
-print("Done inputting")
-
-#displaying weights through the terminal
-network.get_weights()
-
-#displaying the +b 
-print(network.b)
+print("Done inputting -> Program Terminates")

@@ -1,5 +1,5 @@
 longitude,latitude,housing_median_age,total_rooms,total_bedrooms,population,households,median_income,median_house_value
-1,2,3,4,5,6,7,8,9
-2,5,8,11,14,17,20,23,26
-3,6,9,12,15,18,21,24,27
-4,8,12,16,20,24,28,32,36
+1,2,3,4,5,6,7,8,36
+2,5,8,11,14,17,20,23,100
+3,6,9,12,15,18,21,24,108
+4,8,12,16,20,24,28,32,144
