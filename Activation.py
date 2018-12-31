@@ -48,6 +48,10 @@ class Activation(object):
         if self.type == 4 :
             if sVal == 2:
                 self.divide = self.divide * 10
+        
+        if self.type == 3:
+            if sVal == 2:
+                self.divide = self.divide * 10
     
         return
     
@@ -80,7 +84,7 @@ class Activation(object):
     def set_three(self, array):
         size = len(array)
         for i in range(size):
-            array[i][0] = array[i][0] ** 3
+            array[i][0] =  math.atan(array[i][0])
         return
 
     #set up type e
@@ -88,7 +92,7 @@ class Activation(object):
         sArray = len(array)
         #update values in array
         for i in range(sArray):
-            array[i][0] = math.e ** array[i][0]
+            array[i][0] = 1 / (1 + (math.e ** (-1 * array[i][0])))
         
         return
 
